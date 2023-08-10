@@ -1,0 +1,14 @@
+DataDirectory /data
+PidFile /data/tor.pid
+CookieAuthFile /data/control_auth_cookie
+HardwareAccel 1
+Log [handshake]notice [*]notice stderr
+
+SocksPolicy accept 127.0.0.1,accept 172.32.172.0/24
+SocksPolicy reject *
+
+## Hidden Services
+HiddenServiceDir /data
+
+# electrum
+HiddenServicePort 50002 127.0.0.1:50002

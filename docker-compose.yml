@@ -1,0 +1,62 @@
+---
+version: '3.4'
+networks:
+  bitcoin-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.32.172.0/24"
+    enable_ipv6: false
+
+services:
+  tor:
+    image: tor
+    build: ./tor
+    container_name: tor
+    restart: unless-stopped
+    networks:
+      - bitcoin-network
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ./tor/data:/home/tor/data
+    expose:
+      - 8332
+      - 50001
+      - 50002
+    ports:
+      - 8332:8332
+      - 50001:50001
+      - 50002:50002
+
+  bitcoin-core:
+    network_mode: service:tor
+    image: bitcoin-core
+    build: ./bitcoin-core
+    user: 1000:1000
+    container_name: bitcoin-core
+    volumes:
+      - ./bitcoin-core/data:/home/bitcoin/.bitcoin:rw
+    restart: unless-stopped
+    depends_on:
+      - tor
+    command: bitcoind --printtoconsole
+
+  electrs:
+    network_mode: service:tor
+    image: electrs
+    build: ./electrs
+    user: 1000:1000
+    container_name: electrs
+    volumes:
+      - ./electrs/data:/db:rw
+      - ./bitcoin-core/data:/home/electrs/.bitcoin:ro
+    environment:
+      ELECTRUM_RPC_ADDR: "127.0.0.1:50002"
+    restart: always
+    depends_on:
+      - bitcoin-core
+      - tor
