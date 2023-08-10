@@ -32,7 +32,6 @@ services:
       - 8332
       - 50001
       - 50002
-      - 9050
     ports:
       - 8332:8332
       - 50001:50001
@@ -45,6 +44,7 @@ services:
       args:
         UID: "${UID}"
         GID: "${GID}"
+        BITCOIN_CORE_VERSION: "25.0"
     network_mode: service:tor
     image: bitcoin-core
     container_name: bitcoin-core

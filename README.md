@@ -1,9 +1,9 @@
-# bitcoin-stack-docker-compose
+# bitcoin-docker-compose
 
 A docker compose stack consisting of
-- tor
-- bitcoin core
-- electrs
+- [tor](https://www.torproject.org/)
+- [bitcoin core](https://bitcoin.org/en/bitcoin-core/)
+- [electrs](https://github.com/romanz/electrs)
 
 ## usage
 

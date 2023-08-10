@@ -1,13 +1,12 @@
 FROM debian:trixie-slim as builder
 
-# configure bitcoin core version here
-ENV VERSION=25.0
+ARG BITCOIN_CORE_VERSION
 
 WORKDIR /tmp
-ADD https://bitcoin.org/bin/bitcoin-core-${VERSION}/bitcoin-${VERSION}-x86_64-linux-gnu.tar.gz bitcoin.tar.gz
+ADD https://bitcoin.org/bin/bitcoin-core-${BITCOIN_CORE_VERSION}/bitcoin-${BITCOIN_CORE_VERSION}-x86_64-linux-gnu.tar.gz bitcoin.tar.gz
 RUN tar -xvf bitcoin.tar.gz &&\
   rm bitcoin.tar.gz &&\
-  mv bitcoin-${VERSION} bitcoin
+  mv bitcoin-${BITCOIN_CORE_VERSION} bitcoin
 
 FROM debian:trixie-slim
 
