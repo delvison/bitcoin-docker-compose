@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -eo pipefail
+IFS=$'\n\t'
+
+if ! [ -x "$(command -v docker)" ]; then
+  echo 'Error: docker is not installed.' >&2
+  exit 1
+fi
+
+if ! [ -x "$(command -v docker-compose)" ]; then
+  echo 'Error: docker-compose is not installed.' >&2
+  exit 1
+fi
+
+set_uid() {
+  [ -z "${UID}" ] && UID=$(id)
+  [ -z "${GID}" ] && GID=$(id -g)
+  export UID
+  export GID
+}
+
+case $1 in
+  up)
+    echo "Spinning up Docker Images..."
+    set_uid
+    docker-compose up -d --build
+    ;;
+  down)
+    echo "Spinning up Docker Images..."
+    set_uid
+    docker-compose down
+    ;;
+  build)
+    set_uid
+    docker-compose build
+    ;;
+  hostname)
+    if [ -f "tor/data/bitcoin/hostname" ]; then
+      echo "Here is your .onion address:"
+      cat tor/data/bitcoin/hostname
+    fi
+    ;;
+  logs)
+    docker compose logs -f 
+    ;;
+  clean)
+    find ./bitcoin-core/data ! -name '.gitignore' -type f -exec rm -f {} +
+    find ./tor/data ! -name '.gitignore' -type f -exec rm -f {} +
+    find ./electrs/data ! -name '.gitignore' -type f -exec rm -f {} +
+    ;;
+  *)
+    cat <<-EOF
+commands:
+up        -> spin up the environment
+down      -> spins down the environment
+build     -> builds docker images
+hostname  -> prints .onion address
+logs      -> tail docker compose logs
+clean     -> deletes all files in data directories
+EOF
+    ;;
+esac

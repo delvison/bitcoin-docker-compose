@@ -10,12 +10,21 @@ RUN tar -xvf bitcoin.tar.gz &&\
   mv bitcoin-${VERSION} bitcoin
 
 FROM debian:trixie-slim
-RUN useradd -ms /bin/bash bitcoin
+
+ARG UID
+ARG GID
+
+RUN useradd -u "$UID" -ms /bin/bash bitcoin
+COPY --from=builder --chown=bitcoin:bitcoin /tmp/bitcoin /home/bitcoin/binaries
+
 USER bitcoin
 WORKDIR /home/bitcoin
-COPY --from=builder /tmp/bitcoin ./bitcoin
-ENV PATH=$PATH:/home/bitcoin/bitcoin/bin
+COPY --chown=bitcoin:bitcoin ./bitcoin.conf /home/bitcoin/bitcoin.conf
+COPY --chown=bitcoin:bitcoin ./start.sh /usr/bin/start
+RUN chmod +x /usr/bin/start
+
+ENV PATH=$PATH:/home/bitcoin/binaries/bin
 
 EXPOSE 8332/tcp
 
-CMD ["bitcoind", "--printtoconsole"]
+CMD ["/usr/bin/start"]

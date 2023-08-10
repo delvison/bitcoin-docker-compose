@@ -1,5 +1,8 @@
 FROM iangregsondev/electrs:0.9
 
-RUN useradd -ms /bin/bash electrs
+ARG UID
+ARG GID
+
+RUN useradd -u "$UID" -ms /bin/bash electrs
 USER electrs
-WORKDIR /home/electrs
+WORKDIR /electrs

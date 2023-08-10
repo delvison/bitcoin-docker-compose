@@ -1,16 +1,19 @@
 # set alpine as the base image of the Dockerfile
 FROM alpine:latest
 
+ARG UID
+ARG GID
+
+RUN addgroup -g "$GID" -S tor && adduser -u "$UID" -S tor -G tor
+
 # update the package repository and install Tor
 RUN apk update && apk add tor
 
-# Copy over the torrc created above and set the owner to `tor`
-COPY torrc /etc/tor/torrc
-RUN chown -R tor /etc/tor
+RUN mkdir -p /tor/data/bitcoin && chown -R tor:tor /tor
+COPY --chown=tor:tor torrc /etc/tor/torrc
 
-# Set `tor` as the default user during the container runtime
 USER tor
-WORKDIR /home/tor
+WORKDIR /tor
 
 # Set `tor` as the entrypoint for the image
 ENTRYPOINT ["tor"]

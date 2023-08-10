@@ -1,4 +1,0 @@
-!bitcoin-core/data/bitcoin.conf
-bitcoin-core/data/*
-electrs/data
-tor/data
